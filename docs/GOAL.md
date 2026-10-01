@@ -77,3 +77,21 @@ New v1 shape: PURE BOTTOM-UP. No market input of any kind (not the close, not th
 Prediction time is now explicit: model runs weekly (assume Tuesday morning); Week W games use only games from weeks < W. No within-week games inform each other.
 Honest expectation: bottom-up MAE ~10.0–10.5 (near the 10.26 Elo-baseline reference), roughly a point worse than the line's ~9.3. The project's value is showing its work + honest grading, never beating Vegas.
 Feature tests rerun bottom-up (FEATURE_TESTS_V2.md): some cut features get a second trial without the line dominating — especially qb_edge (separate vs folded vs cut verdict needed for the injury-swap design). Previous line-anchored results kept on record in FEATURE_TESTS.md. 2024 test season still locked.
+
+## v1 model LOCKED (2026-09-30, late night)
+Locked 7 bottom-up features + intercept, Ridge(α=100), StandardScaler:
+`elo_diff`, `off_pass_epa`, `off_rush_epa`, `def_pass_epa`, `def_rush_epa`, `qb_edge` (separate — v1 verdict reversed), `st_epa_diff`. No market input anywhere, ever.
+Win probability: Stern method, P(home win) = Φ(μ/σ); σ=13 recalibrated from our own validation residuals. Fair odds in American format; pushes shown as a separate slice near key numbers (3, 7). See hidden_files/RESEARCH_ROUND2.md Q1–Q3.
+Features live in `hidden_files/features_v3.parquet` (v3 = v2 + Tuesday-knowledge QB fix). Older artifacts kept intact (features_v2.parquet, FEATURE_TESTS.md/.md v2).
+
+### Tuesday-knowledge QB rule (leak audit 2026-09-30)
+v2's qb_edge used the game-week depth-chart QB1 — a snapshot of unknown timing. Audit of 3,980 team-weeks found 5 proven leaks (chart listed a backup elevated by a Wed–Fri Out designation) plus ~70 cases where the chart reflected mid-week changes with no pre-Tuesday signal. Decisive measurement: **0 of 373 REG QB Out/Doubtful rows (2015–2024) predate Tuesday 8am ET of their game week** (median stamp Friday). The injury report *never* speaks before Tuesday — so the Tuesday-honest starter is simply **last game's actual starter (most dropbacks)**; Week 1 = preseason chart; byes walk back to the most recent game. No injury lookup needed. Honestly misses ~12 new mid-week QB injuries/season + Monday benching/return news, exactly as a real Tuesday model would. Rule re-verified by a premise `assert` on every feature build. "Auto-update as news breaks" stays a v2-only vision (needs a live feed).
+
+### Official backtest (approved 2026-09-30 — user opened 2024 for the final grade)
+Train 2015–2021 → val 2022–2023 → **2024 graded exactly once, never tuned on**. Pipeline: hidden_files/backtest.py. Outputs: hidden_files/BACKTEST_RESULTS.md (plain-language official grade) + hidden_files/scoreboard.json (clean data for the site). Validation reference: Elo-only 9.840 MAE/62.7% acc; locked-7 ridge 9.722/63.6%; closing-line benchmark 9.322/67.1% (benchmark only, never a feature).
+**Bedtime note:** if the 2024 grade comes back poor (meaningfully worse than 9.72 val MAE, or winner accuracy collapses), research reputable public bottom-up modelers for v2 ideas — user named "furnace picks" on X as the style reference. Learn from, do NOT copy. If the grade is solid, keep it as v2 backlog.
+
+## Project home + deployment (2026-09-30)
+- Home: GitHub repo **OttoCorrect22/Muse_NFL** (private; initial commit pushed: README, docs, scripts). Text files only — parquets excluded (data/README.md explains).
+- Deployment decision: **GitHub Pages** (not Vercel) for the home-base dashboard when real numbers land.
+- Essentials doc: files/v1-essentials.md — plain-language v1 summary (kept current as decisions land).

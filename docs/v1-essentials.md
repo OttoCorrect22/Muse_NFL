@@ -32,15 +32,17 @@ Three panels, always us vs. Vegas vs. reality:
 - **2020 excluded from home-field estimates.** Empty stadiums erased home advantage (+1.70 pts normally, −0.03 in 2020 — measured in our own data).
 - **2024 kickoff rule change.** Treated as a stress test; performance shown per season.
 - **Build-once rule.** Changing a weight creates a new locked model version and reruns the backtest. Never tuned per game.
-- **QB injury auto-update (design, resolved 2026-09-30).** The model's weights stay fixed; the *input* updates — starter ruled out → backup's efficiency swaps in. Honest-backtest verdict: v1 uses a strict **Tuesday-knowledge rule** (availability = latest injury report timestamped before Tuesday 8am ET; ~12 new mid-week QB injuries/season are invisible by construction, exactly as a real Tuesday model would experience). The "updates the hour news breaks" version needs a live feed → v2-only.
-- **Margin → win probability (resolved 2026-09-30).** Textbook bell-curve method with σ=13 (our own data: 12.8, stable across eras). After the official backtest, σ gets recalibrated from the model's own measured errors; pushes shown as their own slice near key numbers (3, 7).
+- **QB injury auto-update (design, resolved 2026-09-30).** The model's weights stay fixed; the *input* updates — starter ruled out → backup's efficiency swaps in. Honest-backtest verdict: v1 uses a strict **Tuesday-knowledge rule** — starter = last game's actual starter (verified: the injury report never designates a QB Out/Doubtful before Tuesday 8am ET, 0/373 rows 2015–2024, so no injury lookup is needed or allowed). ~12 new mid-week QB injuries/season are invisible by construction, exactly as a real Tuesday model would experience. The "updates the hour news breaks" version needs a live feed → v2-only.
+- **Margin → win probability (resolved 2026-09-30).** Textbook bell-curve method with σ recalibrated from our own validation errors (12.68; started at 13.0). Pushes shown as their own slice near key numbers (3, 7).
+
+## Official v1 grade (graded 2026-10-01, final — 2024 will not be tuned on)
+Locked model: Ridge (α=100) on the 7 bottom-up features. **Final exam (2024, 272 games): our average miss 9.91 pts, winners right 68.0%** — vs the closing line's 9.61 pts / 71.3%. We trail Vegas by 0.30 pts (validation was 9.72, so the final is in line with expectations); our predicted margin landed closer than the line in 44.5% of games. Win probabilities calibrate well (predicted 53/60/69/78/86% vs actual 51/73/70/79/87% across buckets); the one soft spot is mild "lean" calls (2–5 pt favorites won 73% vs 60% predicted). Full writeup: hidden_files/BACKTEST_RESULTS.md; site data: hidden_files/scoreboard.json.
 
 ## What's real vs. mock right now
-- **Real:** all data (verified), the Elo baseline backtest (reference numbers on the scoreboard), the feature-test methodology.
-- **Mock:** the home base Build and Games tabs (placeholder weights until the real model is fitted). The Scoreboard tab shows real baseline numbers as a preview.
+- **Real:** all data (verified), the official v1 backtest (numbers above), the feature-test methodology.
+- **Mock:** the home base Build and Games tabs (placeholder weights until the real model is wired in). The Scoreboard tab shows real baseline numbers as a preview.
 
 ## What's next
-1. Bottom-up feature retest → locked feature list (in progress).
-2. Official backtest pipeline + real scoreboard; 2024 opened as the final grade.
-3. Wire real numbers into the home base (replacing mockups).
-4. Ship/no-ship call on v2.
+1. Wire real numbers into the home base (replacing mockups).
+2. Ship/no-ship call on v2.
+3. (v2 backlog) Reputable public bottom-up modeler research for v2 ideas (user named "furnace picks" on X as the style reference) — learn from, never copy. v2-only: live injury auto-update feed, both EPA4 signs revisited, the "lean"-bucket humility.
