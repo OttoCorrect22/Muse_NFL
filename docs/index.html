@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFL Model v1 — Home Base</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <div class="brand-ball" aria-hidden="true"></div>
+      <div>
+        <h1>NFL Model <span class="v1">v1</span></h1>
+        <p class="tagline">Bottom-up predictions. No betting lines as inputs — ever.</p>
+      </div>
+    </div>
+    <div class="live-chip" id="live-chip" hidden>
+      <span class="pulse" aria-hidden="true"></span>
+      <span><strong>LIVE TONIGHT</strong> · Steelers @ Browns, 8:15 PM ET — model says <strong>Steelers by 1.2</strong></span>
+    </div>
+  </div>
+  <nav class="tabs wrap" role="tablist" aria-label="Views">
+    <button class="tab active" data-tab="build" role="tab" aria-selected="true">Build Model</button>
+    <button class="tab" data-tab="games" role="tab" aria-selected="false">Games</button>
+    <button class="tab" data-tab="scoreboard" role="tab" aria-selected="false">Scoreboard</button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ BUILD MODEL ============ -->
+  <section id="tab-build" class="panel active" role="tabpanel">
+    <div class="lock-banner">
+      <div class="lock-icon" aria-hidden="true">🔒</div>
+      <div>
+        <h2>v1 is locked</h2>
+        <p>These seven weights are final. Changing any weight creates a brand-new model version and reruns the
+        entire backtest from scratch — there are no per-game adjustments, ever.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">The seven inputs <span class="sub">each measured as the home team's edge over the visitor</span></h2>
+    <p class="explain">Every number below is in <strong>plain points on the scoreboard</strong>. A bigger edge for the
+    home team means more predicted points for the home team.</p>
+
+    <div id="feature-list" class="feature-list"><!-- built by JS from scoreboard.json --></div>
+
+    <div class="card glossary">
+      <h3>Quick glossary</h3>
+      <p><strong>EPA</strong> = <em>expected points added</em> — how much each play helps a team score, on average.
+      Think of it as a per-play report card.</p>
+      <p><strong>Win probability</strong> = how the predicted score gap converts to a chance of winning
+      (a bigger predicted gap = a higher chance).</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card sees">
+        <h3>What the model sees</h3>
+        <ul>
+          <li>Team stats through <strong>Tuesday morning</strong> of game week</li>
+          <li>Only games from <strong>earlier weeks</strong> — never the same week</li>
+          <li>The starting QB from <strong>last week's actual game</strong> (injury news almost never breaks before Tuesday)</li>
+        </ul>
+      </div>
+      <div class="card never-sees">
+        <h3>What the model never sees</h3>
+        <ul>
+          <li><strong>Betting lines or odds</strong> — of any kind, at any time</li>
+          <li>The closing line is only a <strong>benchmark on the Scoreboard</strong>, so we can grade ourselves against Vegas</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GAMES ============ -->
+  <section id="tab-games" class="panel" role="tabpanel">
+    <div class="games-controls">
+      <label>Season
+        <select id="season-select"></select>
+      </label>
+      <p class="hint">Model prediction vs. the closing line vs. what actually happened.</p>
+    </div>
+
+    <div id="live-row-wrap"></div>
+    <div id="games-table-wrap"></div>
+
+    <div class="card coming-soon">
+      <h3>Full 2026 season game log</h3>
+      <p><span class="pill">Coming soon</span> New picks land every Tuesday morning, and each final score gets graded here against the closing line.</p>
+    </div>
+  </section>
+
+  <!-- ============ SCOREBOARD ============ -->
+  <section id="tab-scoreboard" class="panel" role="tabpanel">
+    <p class="explain">The official report card. The model's numbers, Vegas's closing line as the benchmark,
+    and what actually happened — nothing else.</p>
+
+    <h2 class="section-title">1 · Raw results <span class="sub">how far off the final score, and how often we picked the winner</span></h2>
+    <div id="panel1" class="cards-3"></div>
+
+    <h2 class="section-title">2 · Confidence check <span class="sub">when the model says "86%," does it win 86% of the time?</span></h2>
+    <div class="bucket-toggle">
+      <button class="mini-tab active" data-bucket="test">2024 final test</button>
+      <button class="mini-tab" data-bucket="val">2022–23 validation</button>
+    </div>
+    <div id="panel2"></div>
+    <div id="panel2-extra" class="two-col"></div>
+
+    <h2 class="section-title">3 · Us vs. Vegas vs. reality <span class="sub">2024 final test · 272 games</span></h2>
+    <p class="explain small-note">The closing line appears here <strong>only</strong> — as the benchmark.
+    The model never sees it when predicting.</p>
+    <div id="panel3-agg" class="cards-3"></div>
+    <div class="card">
+      <h3>Game by game: who was closer to the final score?</h3>
+      <p class="explain">Each bar is a slice of the 272 games, grouped by how many points closer one side was.</p>
+      <div id="panel3-dist"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap site-footer">
+  <p>Numbers come from the official v1 backtest (train 2015–2021 · validation 2022–2023 · final test 2024).
+  The model never sees the betting line — it's the benchmark only.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
