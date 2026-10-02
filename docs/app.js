@@ -114,8 +114,21 @@ function renderAll() {
   renderBuild();
   renderGames();
   renderScoreboard();
-  // live chip: show until ~4h after kickoff
-  if (Date.now() < LIVE.kickoffMs + 4 * 3600 * 1000) $('live-chip').hidden = false;
+  // live chip: graded result, live pregame banner, or hidden
+  (function () {
+    const chip = $('live-chip');
+    if (LIVE.graded) {
+      chip.innerHTML = '<span aria-hidden="true">✓</span><span><strong>GRADED</strong> · ' +
+        esc(LIVE.homeFull) + ' ' + LIVE.finalHome + ', ' + esc(LIVE.awayFull) + ' ' + LIVE.finalAway +
+        ' — model off by ' + LIVE.modelMiss.toFixed(1) + ', Vegas off by ' + LIVE.vegasMiss.toFixed(1) + '</span>';
+      chip.hidden = false;
+    } else if (Date.now() < LIVE.kickoffMs + 4 * 3600 * 1000) {
+      chip.innerHTML = '<span class="pulse" aria-hidden="true"></span><span><strong>LIVE TONIGHT</strong> · ' +
+        esc(LIVE.awayFull) + ' @ ' + esc(LIVE.homeFull) + ', ' + esc(LIVE.kickoffLabel) +
+        ' — model says <strong>' + esc(LIVE.awayFull.split(' ')[1]) + ' by ' + LIVE.predAwayBy.toFixed(1) + '</strong></span>';
+      chip.hidden = false;
+    }
+  })();
 }
 
 /* ---------------- BUILD MODEL ---------------- */
