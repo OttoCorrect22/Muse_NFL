@@ -1,6 +1,6 @@
 # NFL Prediction Model v1 — The Essentials
 
-*Plain-language capture of the project. Last updated 2026-09-30.*
+*Plain-language capture of the project. Last updated 2026-10-02.*
 
 ## What we're building
 A finished, honest NFL game-prediction project. One league (NFL), one question: **can we predict the final score margin better than just reading the betting line?** Regular season only. This is an engineering project to *finish* — not a money printer. Nobody beats the Vegas closing line consistently, and we're not pretending to.
@@ -39,10 +39,12 @@ Three panels, always us vs. Vegas vs. reality:
 Locked model: Ridge (α=100) on the 7 bottom-up features. **Final exam (2024, 272 games): our average miss 9.91 pts, winners right 68.0%** — vs the closing line's 9.61 pts / 71.3%. We trail Vegas by 0.30 pts (validation was 9.72, so the final is in line with expectations); our predicted margin landed closer than the line in 44.5% of games. Win probabilities calibrate well (predicted 53/60/69/78/86% vs actual 51/73/70/79/87% across buckets); the one soft spot is mild "lean" calls (2–5 pt favorites won 73% vs 60% predicted). Full writeup: hidden_files/BACKTEST_RESULTS.md; site data: hidden_files/scoreboard.json.
 
 ## What's real vs. mock right now
-- **Real:** all data (verified), the official v1 backtest (numbers above), the feature-test methodology.
-- **Mock:** the home base Build and Games tabs (placeholder weights until the real model is wired in). The Scoreboard tab shows real baseline numbers as a preview.
+- **Real:** all data (verified), the official v1 backtest (numbers above), the feature-test methodology, and the home base itself — Build, Games, and Scoreboard tabs are all wired to the real backtest data (wired 2026-10-01, pushed to the repo's /docs folder).
+- **Mock:** nothing in the dashboard is mock anymore. The pinned live row on the Games tab showed the Steelers–Browns pick as "result pending" until the 2026-10-02 grade; it now shows the graded result (Browns 27–24: model wrong on the winner, closer than the line on margin, 4.2 vs 5.5 pts).
 
 ## What's next
-1. Wire real numbers into the home base (replacing mockups).
+1. ~~Wire real numbers into the home base (replacing mockups).~~ Done 2026-10-01 — all three tabs read the real backtest data.
 2. Ship/no-ship call on v2.
-3. (v2 backlog) Reputable public bottom-up modeler research for v2 ideas (user named "furnace picks" on X as the style reference) — learn from, never copy. v2-only: live injury auto-update feed, both EPA4 signs revisited, the "lean"-bucket humility.
+3. Publish the dashboard: flip on GitHub Pages (Settings → Pages, branch main, folder /docs, ~30 seconds) so the pushed /docs site goes live — still the user's step as of 2026-10-02.
+4. Week 4 slate: user was offered a Saturday locked-model run over all remaining Week 4 games (picks posted before the London game, graded three-way after Monday night) — awaiting his answer as of 2026-10-02 morning. Note: Baker Mayfield is out (dislocated throwing thumb, min 3 weeks), so Tampa's starter input must be rookie Jalon Daniels, not Mayfield.
+3. (v2 backlog) Reputable public bottom-up modeler research for v2 ideas (user named "furnace picks" on X as the style reference) — learn from, never copy. v2-only: live injury auto-update feed, both EPA4 signs revisited, the "lean"-bucket humility. Added 2026-10-02: PFF's weekly team-strength review (2026-10-01) downweights turnovers in EPA-per-play to make it more predictive, and opponent-adjusts + splits pass/rush — directly relevant to the EPA4 revisit; note for when v2 is greenlit.

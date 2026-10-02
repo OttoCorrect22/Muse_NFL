@@ -2,17 +2,25 @@
    plus the two real constants below. Nothing is invented. */
 'use strict';
 
-/* Tonight's first live prediction — from hidden_files/live/prediction_2026_w4_pit_cle.json */
+/* First live prediction — from hidden_files/live/prediction_2026_w4_pit_cle.json.
+   Graded 2026-10-02 after the final whistle: Browns 27, Steelers 24. */
 const LIVE = {
   away: 'PIT', home: 'CLE',
   awayFull: 'Pittsburgh Steelers', homeFull: 'Cleveland Browns',
-  kickoffLabel: 'Tonight, 8:15 PM ET',
+  kickoffLabel: 'Thu Oct 1, 8:15 PM ET',
   kickoffMs: new Date('2026-10-01T20:15:00-04:00').getTime(),
   predAwayBy: 1.22,          // Steelers by 1.22
   winProbAway: 53.8,         // Steelers win probability %
   bucket: "pick'em",
   lineNote: 'Steelers −2.5', // benchmark only, never a model input
-  qbs: 'Aaron Rodgers (PIT) vs Deshaun Watson (CLE) — Tuesday-morning starters'
+  qbs: 'Aaron Rodgers (PIT) vs Deshaun Watson (CLE) — Tuesday-morning starters',
+  graded: true,              // final whistle has blown; liveRowHtml() renders the grade
+  finalAway: 24, finalHome: 27,
+  modelMiss: 4.2,            // |(+1.22) - (-3)| pts — model's margin error
+  vegasMiss: 5.5,            // |(+2.5) - (-3)| pts — closing line's margin error
+  winnerRight: false,        // both the model and Vegas picked Pittsburgh; Browns won
+  gradeNote: 'Cooler on the favorite was the better read on the margin — wrong on the winner. ' +
+    'A pick’em-bucket call loses about half the time by design.'
 };
 
 /* Locked v1 feature weights, in plain points (from the official backtest) */
@@ -133,14 +141,28 @@ function renderBuild() {
 
 /* ---------------- GAMES ---------------- */
 function liveRowHtml() {
+  if (!LIVE.graded) {
+    return '<div class="live-row">' +
+      '<span class="badge">Live · result pending</span>' +
+      '<h3>' + esc(LIVE.awayFull) + ' @ ' + esc(LIVE.homeFull) + '</h3>' +
+      '<p class="pred-line">Model says <strong>' + esc(LIVE.awayFull.split(' ')[1]) + ' by ' + LIVE.predAwayBy.toFixed(2) +
+      '</strong> · win chance ' + LIVE.winProbAway.toFixed(1) + '% (' + esc(LIVE.bucket) + ')</p>' +
+      '<p>Kickoff: ' + esc(LIVE.kickoffLabel) + ' · Closing line for reference: ' + esc(LIVE.lineNote) + ' (benchmark only)</p>' +
+      '<p>QBs: ' + esc(LIVE.qbs) + '</p>' +
+      '<p><em>Graded here after the final whistle — model miss vs. Vegas miss, and whether the pick was right.</em></p>' +
+      '</div>';
+  }
   return '<div class="live-row">' +
-    '<span class="badge">Live · result pending</span>' +
+    '<span class="badge">Graded · first live result</span>' +
     '<h3>' + esc(LIVE.awayFull) + ' @ ' + esc(LIVE.homeFull) + '</h3>' +
-    '<p class="pred-line">Model says <strong>' + esc(LIVE.awayFull.split(' ')[1]) + ' by ' + LIVE.predAwayBy.toFixed(2) +
-    '</strong> · win chance ' + LIVE.winProbAway.toFixed(1) + '% (' + esc(LIVE.bucket) + ')</p>' +
-    '<p>Kickoff: ' + esc(LIVE.kickoffLabel) + ' · Closing line for reference: ' + esc(LIVE.lineNote) + ' (benchmark only)</p>' +
-    '<p>QBs: ' + esc(LIVE.qbs) + '</p>' +
-    '<p><em>Graded here after the final whistle — model miss vs. Vegas miss, and whether the pick was right.</em></p>' +
+    '<p class="pred-line">Final: <strong>' + esc(LIVE.homeFull) + ' ' + LIVE.finalHome + ', ' + esc(LIVE.awayFull) + ' ' + LIVE.finalAway + '</strong>' +
+    ' · played ' + esc(LIVE.kickoffLabel) + '</p>' +
+    '<p>Model said ' + esc(LIVE.awayFull.split(' ')[1]) + ' by ' + LIVE.predAwayBy.toFixed(2) +
+    ' · ' + LIVE.winProbAway.toFixed(1) + '% to win (' + esc(LIVE.bucket) + ') · Closing line ' + esc(LIVE.lineNote) + ' (benchmark only)</p>' +
+    '<div class="stat-row"><span class="lbl">Winner picked right?</span><span class="win-no">No — both picked Pittsburgh</span></div>' +
+    '<div class="stat-row"><span class="lbl">Model margin miss</span><span class="model-c">' + LIVE.modelMiss.toFixed(1) + ' pts</span></div>' +
+    '<div class="stat-row"><span class="lbl">Vegas margin miss</span><span class="vegas-c">' + LIVE.vegasMiss.toFixed(1) + ' pts</span></div>' +
+    '<p><em>' + esc(LIVE.gradeNote) + '</em></p>' +
     '</div>';
 }
 
