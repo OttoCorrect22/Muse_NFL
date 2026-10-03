@@ -1,7 +1,7 @@
 {
   "season": 2026,
   "week": 4,
-  "generated_at": "2026-10-03T15:40:55-04:00",
+  "generated_at": "2026-10-03T16:23:52-04:00",
   "status": "picks_posted",
   "games": [
     {
@@ -176,14 +176,14 @@
       "away": "NYJ",
       "home": "CHI",
       "kickoff_et": "2026-10-04 13:00",
-      "pred_home_margin": 9.11,
+      "pred_home_margin": 8.95,
       "favorite": "CHI",
-      "win_prob_home": 0.764,
-      "win_prob_away": 0.236,
+      "win_prob_home": 0.76,
+      "win_prob_away": 0.24,
       "bucket": "strong",
       "qb_away": "Geno Smith",
-      "qb_home": "Case Keenum",
-      "note": "Injury check: Bears QB Caleb Williams (hamstring) was ruled out Friday for the second straight game \u2014 but the model already had Case Keenum (the Week 3 starter) as the QB input, so the pick is unchanged.",
+      "qb_home": "Tyson Bagent",
+      "note": "Injury revision (Sat): Caleb Williams (hamstring) was ruled out Friday for the second straight game \u2014 invisible to the Tuesday model, which had Case Keenum (the Week 3 starter, 24/34 for 247 yards and 3 TDs in Monday night's 27-7 win over Philadelphia) as the QB input. Saturday reports say Tyson Bagent (cleared from concussion protocol, took most of the first-team reps this week) is expected to start vs the Jets instead \u2014 the team hasn't officially announced it. Re-ran the pick with Bagent as the QB input (graded by the model's shrinkage rule on his limited career dropbacks).",
       "graded": false,
       "final_away": null,
       "final_home": null,
