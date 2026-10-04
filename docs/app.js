@@ -67,6 +67,85 @@ function winnerCorrect(pred, actual) {
   return Math.sign(pred) === Math.sign(actual) ? 'yes' : 'no';
 }
 
+/* ---------------- LIVE PRELIMINARY GRADES ----------------
+   After the picks are posted, the page grades itself: it pulls final
+   scores and the DraftKings closing line from ESPN's public API right in
+   the browser and shows PRELIMINARY grades as games go final. The official
+   grade (Vegas consensus line, like the backtest) still comes from the
+   Tuesday grading run and always takes precedence. If ESPN is unreachable,
+   the page works exactly as before — picks only. Nothing is invented. */
+const ESPN_ABBR = { WAS: 'WSH', LA: 'LAR' };
+const espnAbbr = (a) => ESPN_ABBR[a] || a;
+
+let LIVE = {}; /* "<away>_<home>" -> preliminary grade fields */
+
+function parseHomeMargin(details, awayAbbr, homeAbbr) {
+  // details looks like "IND -4.5" (team, signed spread; negative = favored) or "PK"
+  const m = String(details).trim().match(/^([A-Z]{2,3})(?:\s+([+-]?\d+(?:\.\d+)?))?/);
+  if (!m) return null;
+  if (m[2] === undefined) return 0;
+  const spread = parseFloat(m[2]);
+  if (m[1] === awayAbbr) return spread;
+  if (m[1] === homeAbbr) return -spread;
+  return null;
+}
+
+/* The grade to show for a game: official (Tuesday run) wins, else live preliminary, else none. */
+function gradeFor(g) {
+  if (g.graded) return g;
+  const live = LIVE[g.away + '_' + g.home];
+  return live ? Object.assign({ preliminary: true }, g, live) : null;
+}
+
+async function fetchLiveGrades() {
+  try {
+    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard' +
+      '?dates=' + WEEK.season + '&seasontype=2&week=' + WEEK.week);
+    if (!res.ok) return;
+    const sb = await res.json();
+    const byTeams = {};
+    WEEK.games.forEach((g) => { byTeams[espnAbbr(g.away) + '@' + espnAbbr(g.home)] = g; });
+    const finals = [];
+    (sb.events || []).forEach((ev) => {
+      const comp = ev.competitions[0];
+      if (!comp || comp.status.type.name !== 'STATUS_FINAL') return;
+      let aA = null, hA = null, aS = null, hS = null;
+      comp.competitors.forEach((t) => {
+        const s = parseInt(t.score, 10);
+        if (t.homeAway === 'away') { aA = t.team.abbreviation; aS = s; }
+        else { hA = t.team.abbreviation; hS = s; }
+      });
+      const g = byTeams[aA + '@' + hA];
+      if (!g || g.graded || aS === null || hS === null || isNaN(aS) || isNaN(hS)) return;
+      finals.push({ key: g.away + '_' + g.home, ev, awayAbbr: aA, homeAbbr: hA,
+                    awayScore: aS, homeScore: hS, pred: g.pred_home_margin });
+    });
+    await Promise.all(finals.map(async (f) => {
+      try {
+        const r = await fetch('https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/' +
+          f.ev.id + '/competitions/' + f.ev.id + '/odds?lang=en');
+        if (!r.ok) return;
+        const odds = await r.json();
+        const item = (odds.items || [])[0];
+        if (!item || !item.details) return;
+        const dkLine = parseHomeMargin(item.details, f.awayAbbr, f.homeAbbr);
+        if (dkLine === null || dkLine === undefined) return;
+        const actual = f.homeScore - f.awayScore;
+        LIVE[f.key] = {
+          final_away: f.awayScore, final_home: f.homeScore,
+          closing_line: dkLine,
+          line_provider: (item.provider && item.provider.name) || 'DraftKings',
+          winner_right: winnerCorrect(f.pred, actual) === 'yes',
+          model_abs_err: Math.abs(actual - f.pred),
+          vegas_abs_err: Math.abs(actual - dkLine),
+        };
+      } catch (e) { /* skip this game; page still works */ }
+    }));
+  } catch (e) { /* ESPN unreachable — picks only, as before */ }
+  renderWeek();
+  renderChip();
+}
+
 /* ---------------- tabs ---------------- */
 document.querySelectorAll('.tab').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -87,7 +166,7 @@ Promise.all([
   fetch('scoreboard.json').then((r) => { if (!r.ok) throw new Error('scoreboard.json HTTP ' + r.status); return r.json(); }),
   fetch('weekly_picks.json').then((r) => { if (!r.ok) throw new Error('weekly_picks.json HTTP ' + r.status); return r.json(); }),
 ])
-  .then(([data, week]) => { DB = data; WEEK = week; renderAll(); })
+  .then(([data, week]) => { DB = data; WEEK = week; renderAll(); fetchLiveGrades(); })
   .catch((e) => {
     document.querySelector('main').innerHTML =
       '<div class="error">Couldn\u2019t load the dashboard data (' + esc(e.message) + ').</div>';
@@ -127,6 +206,18 @@ function renderChip() {
     chip.innerHTML = '<span aria-hidden="true">✓</span><span><strong>GRADED</strong> · ' +
       esc(teamName(g.home)) + ' ' + g.final_home + ', ' + esc(teamName(g.away)) + ' ' + g.final_away +
       ' — model off by ' + g.model_abs_err.toFixed(1) + ', Vegas off by ' + g.vegas_abs_err.toFixed(1) + '</span>';
+    chip.hidden = false;
+    return;
+  }
+  const prelim = Object.keys(LIVE)
+    .map((k) => WEEK.games.find((x) => x.away + '_' + x.home === k))
+    .filter(Boolean)
+    .sort((a, b) => b.kickoff_et.localeCompare(a.kickoff_et));
+  if (prelim.length) {
+    const g = prelim[0], live = LIVE[g.away + '_' + g.home];
+    chip.innerHTML = '<span aria-hidden="true">◷</span><span><strong>PRELIMINARY</strong> · ' +
+      esc(teamName(g.home)) + ' ' + live.final_home + ', ' + esc(teamName(g.away)) + ' ' + live.final_away +
+      ' — model off by ' + live.model_abs_err.toFixed(1) + ', DK line off by ' + live.vegas_abs_err.toFixed(1) + '</span>';
     chip.hidden = false;
     return;
   }
@@ -229,19 +320,23 @@ function fmtGenDate(iso) {
 }
 
 function weekGameHtml(g) {
+  const gr = gradeFor(g); /* null, official grade, or live preliminary grade */
   const favShort = teamName(g.favorite).split(' ').slice(-1)[0];
   const favProb = Math.round(100 * Math.max(g.win_prob_home, g.win_prob_away));
-  const badge = (g.graded ? 'Graded · ' : 'Week ' + WEEK.week + ' · ') + fmtKickoff(g.kickoff_et);
+  const badge = gr
+    ? (gr.preliminary ? 'Preliminary grade · ' : 'Graded · ') + fmtKickoff(g.kickoff_et)
+    : ('Week ' + WEEK.week + ' · ') + fmtKickoff(g.kickoff_et);
   let html = '<div class="live-row">' +
     '<span class="badge">' + esc(badge) + '</span>' +
+    (gr && gr.preliminary ? '<span class="badge prelim">live from ESPN</span>' : '') +
     '<h3>' + esc(teamName(g.away)) + ' @ ' + esc(teamName(g.home)) + '</h3>';
-  if (!g.graded) {
+  if (!gr) {
     html += '<p class="pred-line">Model says <strong>' + esc(favShort) + ' by ' +
       Math.abs(g.pred_home_margin).toFixed(1) + '</strong> · ' + favProb + '% to win (' + esc(g.bucket) + ')</p>';
   } else {
-    const res = g.final_home >= g.final_away
-      ? teamName(g.home) + ' ' + g.final_home + ', ' + teamName(g.away) + ' ' + g.final_away
-      : teamName(g.away) + ' ' + g.final_away + ', ' + teamName(g.home) + ' ' + g.final_home;
+    const res = gr.final_home >= gr.final_away
+      ? teamName(g.home) + ' ' + gr.final_home + ', ' + teamName(g.away) + ' ' + gr.final_away
+      : teamName(g.away) + ' ' + gr.final_away + ', ' + teamName(g.home) + ' ' + gr.final_home;
     html += '<p class="pred-line">Final: <strong>' + esc(res) + '</strong></p>' +
       '<p>Model said ' + esc(favShort) + ' by ' + Math.abs(g.pred_home_margin).toFixed(1) +
       ' · ' + favProb + '% to win (' + esc(g.bucket) + ')</p>';
@@ -253,32 +348,47 @@ function weekGameHtml(g) {
   if (g.note) {
     html += '<div class="week-note">' + esc(g.note) + '</div>';
   }
-  if (g.graded) {
-    const wc = g.winner_right === true ? '<span class="win-yes">Yes</span>'
-      : g.winner_right === false ? '<span class="win-no">No</span>' : '<span class="win-push">—</span>';
+  if (gr) {
+    const wc = gr.winner_right === true ? '<span class="win-yes">Yes</span>'
+      : gr.winner_right === false ? '<span class="win-no">No</span>' : '<span class="win-push">—</span>';
     html += '<div class="stat-row"><span class="lbl">Winner picked right?</span><span>' + wc + '</span></div>' +
       '<div class="stat-row"><span class="lbl">Model margin miss</span><span class="model-c">' +
-      g.model_abs_err.toFixed(1) + ' pts</span></div>' +
-      '<div class="stat-row"><span class="lbl">Vegas margin miss</span><span class="vegas-c">' +
-      g.vegas_abs_err.toFixed(1) + ' pts</span></div>';
-    if (g.closing_line !== null && g.closing_line !== undefined) {
-      html += '<p>Closing line ' + esc(pickLabel(g.closing_line, g.home, g.away)) +
-        ' (benchmark only — the model never sees it)</p>';
+      gr.model_abs_err.toFixed(1) + ' pts</span></div>' +
+      '<div class="stat-row"><span class="lbl">' +
+      (gr.preliminary ? 'DraftKings line miss' : 'Vegas margin miss') +
+      '</span><span class="vegas-c">' +
+      gr.vegas_abs_err.toFixed(1) + ' pts</span></div>';
+    if (gr.closing_line !== null && gr.closing_line !== undefined) {
+      html += '<p>' + (gr.preliminary ? 'DraftKings closing line ' : 'Closing line ') +
+        esc(pickLabel(gr.closing_line, g.home, g.away)) +
+        (gr.preliminary
+          ? ' (preliminary — the official grade uses the Vegas line on Tuesday)'
+          : ' (benchmark only — the model never sees it)') + '</p>';
     }
-    if (g.grade_note) html += '<p><em>' + esc(g.grade_note) + '</em></p>';
+    if (gr.grade_note) html += '<p><em>' + esc(gr.grade_note) + '</em></p>';
   }
   return html + '</div>';
 }
 
 function renderWeek() {
   const n = WEEK.games.length;
-  const sub = WEEK.status === 'graded'
-    ? 'All ' + n + ' games graded — us vs. the closing line vs. what actually happened.'
-    : n + ' games, ' + WEEK.games.filter((g) => !g.graded).length + ' still to play. ' +
+  const nPrelim = Object.keys(LIVE).length;
+  let sub;
+  if (WEEK.status === 'graded') {
+    sub = 'All ' + n + ' games graded — us vs. the closing line vs. what actually happened.';
+  } else {
+    sub = n + ' games, ' + WEEK.games.filter((g) => !g.graded).length + ' still to play. ' +
       'Picks from the locked v1 model, generated ' + esc(fmtGenDate(WEEK.generated_at)) +
       ' from team stats through Week ' + (WEEK.week - 1) + '.';
-  $('week-sub').innerHTML = 'Week ' + WEEK.week + ' · ' + sub +
-    ' The closing line never appears here before kickoff — it\u2019s the benchmark only, added when games are graded.';
+    if (nPrelim) {
+      sub += ' ' + nPrelim + ' preliminary grade' + (nPrelim === 1 ? '' : 's') +
+        ' in below — final score plus the DraftKings closing line, live from ESPN. ' +
+        'The official grade (Vegas line, like the backtest) lands Tuesday.';
+    } else {
+      sub += ' The closing line never appears here before kickoff — it\u2019s the benchmark only, added when games are graded.';
+    }
+  }
+  $('week-sub').innerHTML = 'Week ' + WEEK.week + ' · ' + sub;
   $('week-games').innerHTML = WEEK.games.map(weekGameHtml).join('');
 }
 
