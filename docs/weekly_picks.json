@@ -1,7 +1,7 @@
 {
   "season": 2026,
   "week": 4,
-  "generated_at": "2026-10-04T08:07:56-04:00",
+  "generated_at": "2026-10-04T18:52:45-04:00",
   "status": "picks_posted",
   "games": [
     {
@@ -309,7 +309,7 @@
       "bucket": "lean",
       "qb_away": "Jared Goff",
       "qb_home": "Bryce Young",
-      "note": "Injury check: Lions S Brian Branch (Achilles) was ruled out Friday vs Carolina (coach Dan Campbell says he's close); Panthers G Damien Lewis (elbow) is out. Friday news, invisible to the Tuesday-rules model; pick unchanged.",
+      "note": "Injury check: Lions S Brian Branch (Achilles) was ruled out Friday vs Carolina (coach Dan Campbell says he's close); Panthers G Damien Lewis (elbow) is out. Friday news, invisible to the Tuesday-rules model; pick unchanged. Panthers also placed both starting CBs (Jaycee Horn, Mike Jackson) on IR Wednesday, leaving three healthy corners on the roster; WR Xavier Legette (knee) is out. Wednesday news, invisible to the Tuesday-rules model; pick unchanged.",
       "graded": false,
       "final_away": null,
       "final_home": null,
