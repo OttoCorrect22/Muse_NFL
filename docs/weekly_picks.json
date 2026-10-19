@@ -1,7 +1,7 @@
 {
   "season": 2026,
   "week": 6,
-  "generated_at": "2026-10-18T14:35:06-04:00",
+  "generated_at": "2026-10-19T08:07:12-04:00",
   "status": "picks_posted",
   "games": [
     {
@@ -99,7 +99,7 @@
       "bucket": "strong",
       "qb_away": "Jayden Daniels",
       "qb_home": "Brock Purdy",
-      "note": "Partial Week 6 slate (built Sun 2026-10-18): TNF, Wembley, and the 1 PM ET games were already played/underway \u2014 only these 5 games predicted.",
+      "note": "Partial Week 6 slate (built Sun 2026-10-18): TNF, Wembley, and the 1 PM ET games were already played/underway \u2014 only these 5 games predicted. INJURY FLAGS (Mon 10/19 8am ET \u2014 official statuses, ESPN feed + HC Quinn Friday): SF: WR Deebo Samuel (hamstring) OUT, DE Nick Bosa (calf) OUT, S Marques Sigle (ankle) OUT, LB Garret Wallow (hamstring) OUT, WR Mike Evans (ribs) QUESTIONABLE. WAS: RB Jacory Croskey-Merritt (groin) OUT (ruled out by Quinn), DE Charles Omenihu (groin) OUT, OLB Javontae Jean-Baptiste (pectoral) OUT, WR Stefon Diggs (hamstring) QUESTIONABLE (practiced Friday), backup QB Marcus Mariota (knee MCL) OUT \u2014 starter Jayden Daniels healthy. SF starter Brock Purdy healthy. QBs match model inputs; no numeric change (non-QB flags only).",
       "graded": false,
       "final_away": null,
       "final_home": null,
