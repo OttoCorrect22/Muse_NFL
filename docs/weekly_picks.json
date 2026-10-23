@@ -1,7 +1,7 @@
 {
   "season": 2026,
   "week": 7,
-  "generated_at": "2026-10-23T08:08:35-04:00",
+  "generated_at": "2026-10-23T08:14:44-04:00",
   "status": "picks_posted",
   "games": [
     {
@@ -57,7 +57,7 @@
       "bucket": "lean",
       "qb_away": "Joe Burrow",
       "qb_home": "Tyler Huntley",
-      "note": "Injury update (Fri): QB Lamar Jackson (ankle) limited Wednesday and Thursday \u2014 practiced in uniform Thursday but no full practice and no designation yet (Baltimore Beatdown, Cincinnati Enquirer, AtoZ Sports); still day-to-day, not cleared. Tyler Huntley remains the presumptive starter for a third straight start (multiple outlets). Ravens upgraded WR Rashod Bateman, G Vega Ioane and LT Ronnie Stanley to full Thursday. QBs unchanged (Burrow vs Huntley) \u2014 no revision, no numeric change.",
+      "note": "Injury update (Fri): QB Lamar Jackson (ankle) limited Wednesday and Thursday \u2014 practiced in uniform Thursday but no full practice (Baltimore Beatdown, Cincinnati Enquirer, AtoZ Sports); the ESPN injury feed (read 8:06 AM ET) lists him Questionable \u2014 still day-to-day, not cleared. Tyler Huntley remains the presumptive starter for a third straight start (multiple outlets). Ravens upgraded WR Rashod Bateman, G Vega Ioane and LT Ronnie Stanley to full Thursday. QBs unchanged (Burrow vs Huntley) \u2014 no revision, no numeric change.",
       "graded": false,
       "final_away": null,
       "final_home": null,
