@@ -1,7 +1,7 @@
 {
   "season": 2026,
   "week": 7,
-  "generated_at": "2026-10-25T08:07:55-04:00",
+  "generated_at": "2026-10-26T08:07:20-04:00",
   "status": "picks_posted",
   "games": [
     {
@@ -288,7 +288,7 @@
       "bucket": "lean",
       "qb_away": "Dak Prescott",
       "qb_home": "Tanner McKee",
-      "note": "Injury update (Fri): Eagles officially placed Jalen Hurts (blood clot) on IR \u2014 out for the season (team/ESPN). Tanner McKee confirmed starter vs Cowboys \u2014 already the model input, no numeric change. Eagles OT Lane Johnson OUT for Monday night (McKee's blind side).",
+      "note": "Injury update (Fri): Eagles officially placed Jalen Hurts (blood clot) on IR \u2014 out for the season (team/ESPN). Tanner McKee confirmed starter vs Cowboys \u2014 already the model input, no numeric change. Eagles OT Lane Johnson OUT for Monday night (McKee's blind side). Monday update: Saturday's final injury report (NBC Sports, Bleeding Green Nation, Eagles Wire) \u2014 Eagles ruled OUT: WR DeVonta Smith (hamstring), WR Dontayvion Wicks (ankle), LB Nolan Smith (concussion), DB Michael Carter II (abdomen). Questionable: RB Saquon Barkley (hamstring, full Saturday practice, trending to play), OLB Jonathan Greenard (ankle, game-time decision), LB Jalyx Hunt (knee/ankle), G Landon Dickerson (knee/pectoral, full Saturday). TE Dallas Goedert (knee) full Saturday, no designation, expects to play. QBs unchanged (Prescott vs McKee) \u2014 no numeric change.",
       "graded": false,
       "final_away": null,
       "final_home": null,
